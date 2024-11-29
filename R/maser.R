@@ -1,20 +1,26 @@
 #' @importFrom GenomicRanges GRanges
 #' @importFrom IRanges IRanges
-create_GRanges_exon <- function(chr, start, end, strand, id, gene_id, 
-                                gene_symbol){
+
+create_GRanges_exon <- function(chr, start, end, strand, id, gene_id, gene_symbol) {
+  # 检查start和end是否包含NA值
+  if (any(is.na(start)) || any(is.na(end))) {
+    warning("NA values found in 'start' or 'end', skipping...")
+    return(NULL) # 返回NULL，表示跳过这个区间的创建
+  }
   
-  if(any(!grepl("chr", chr))){
+  # 确保染色体名称以'chr'开头
+  if (any(!grepl("^chr", chr))) {
     echr <- paste0("chr", chr)
-  }else{
+  } else {
     echr <- chr
   }
   
+  # 创建GRanges对象
   exon <- GRanges(seqnames = echr, 
-    ranges = IRanges::IRanges(start = start, end = end), strand = strand,
-    ID = id, GeneID = gene_id, geneSymbol = gene_symbol)
+                  ranges = IRanges(start = start, end = end), strand = strand,
+                  ID = id, GeneID = gene_id, geneSymbol = gene_symbol)
   
   return(exon)
-  
 }
 
 create_GRanges_ASS <- function(events){
